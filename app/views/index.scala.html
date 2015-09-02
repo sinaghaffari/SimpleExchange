@@ -1,7 +1,26 @@
-@(message: String)
+@import play.api.libs.json.JsObject
+@(json: JsObject, srcAmt: Float, dstAmt: Float, srcCur: String, dstCur: String)
 
-@main("Welcome to Play") {
+@main("Simple Exchange") {
+    <form action="/" method="get">
+        <input name="srcAmt" type="number" min="0" value="@srcAmt" /> in
+        <select name="srcCur">
+        @for(key <- json.keys.toList.sorted) {
+            <option @if(srcCur.startsWith(key)) {selected="selected"} value="@key">
+            @{val s = key + " - " + json.value.get(key).get.toString().replace("\"", ""); s}
+            </option>
+        }
+        </select> is <br/>
+        <input name="dstAmt" type="number" min="0" value="@dstAmt" disabled/> in
+        <select name="dstCur">
+        @for(key <- json.keys.toList.sorted) {
+            <option @if(dstCur.startsWith(key)) {selected="selected"} value="@key">
+            @{val s = key + " - " + json.value.get(key).get.toString().replace("\"", ""); s}
+            </option>
+        }
+        </select><br/>
+        <button type="submit">Calculate!</button>
+    </form>
 
-    @play20.welcome(message)
 
 }
