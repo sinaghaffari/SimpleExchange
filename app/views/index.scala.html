@@ -10,7 +10,9 @@
             @{val s = key + " - " + json.value.get(key).get.toString().replace("\"", ""); s}
             </option>
         }
-        </select> is <br/>
+        </select> <br/>
+        is
+        <br/>
         <input name="dstAmt" type="number" min="0" value="@dstAmt" disabled/> in
         <select name="dstCur">
         @for(key <- json.keys.toList.sorted) {
