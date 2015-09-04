@@ -5,7 +5,7 @@
 @main("Simple Exchange") {
     <form class="form-inline" action='/' method='get'>
         <div class="input-group">
-            <input name="srcAmt" id="srcAmt" type="" class="form-control conversion-form" placeholder="Enter an amount..." min="0" step="any" value="@{var fmt = new DecimalFormat("0.00########"); fmt.format(srcAmt)}" />
+            <input name="srcAmt" id="srcAmt" type="number" class="form-control conversion-form" placeholder="Enter an amount..." min="0" step="any" required="required" value="@{var fmt = new DecimalFormat("0.00########"); fmt.format(srcAmt)}" />
 
             <span class="input-group-btn">
                 <select name="srcCur" id="srcCur" class="form-control select select-default conversion" style="visibility: hidden">
