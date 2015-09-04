@@ -1,7 +1,85 @@
-form
-{
+/*
+--turquoise 	    #1abc9c;
+--green_sea 	    #16a085;
+--sun_flower 	    #f1c40f;
+--orange 		    #f39c12;
+
+--emerald 		    #2ecc71;
+--nephritis 	    #27ae60;
+--carrot 		    #e67e22;
+--pumpkin 		    #d35400;
+
+--peter_river 	    #3498db;
+--belize_hole 	    #2980b9;
+--alizarin		    #e74c3c;
+--pomegranate	    #c0392b;
+
+--amethyst		    #9e5eb8;
+--wisteria		    #8e44ad;
+--clouds		    #ecf0f1;
+--silver		    #bdc3c7;
+
+--wet_asphalt 	    #34495e;
+--midnight_blue     #2c3e50;
+--concrete	        #95a5a6;
+--asbestos	        #7f8c8d;
+*/
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance:textfield;
+}
+
+#mainBody {
+    background: #2c3e50;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #333;
+    padding:10px;
+}
+form {
+    width:1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+#displayArea {
+    color: #3498db;
+    font-weight: bold;
+    margin-top:100px;
     padding:20px;
-    margin-left:auto;
-    margin-right:auto;
-    width:600px;
+    text-align: center;
+    width:500px;
+    background-color: #34495e;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    border: 1px solid #1abc9c;
+}
+.display-srcAmt, .display-dstAmt {
+    font-size: 30px;
+}
+
+.display-srcCur, .display-dstCur {
+    font-weight: lighter;
+    color: #2980b9;
+}
+
+.conversion-form {
+    border-radius: 0px;
+    border-width: 1px;
+    border-color: #1abc9c !important;
+    background-color: #34495e !important;
+    color: #ecf0f1 !important;
+    box-shadow: none !important;
+}
+.select2-results__option--highlighted {
+    background-color: #16a085 !important;
+}
+#swap-button {
+    border-radius:0px;
+    margin-left:-1px;
+    margin-right:-1px;
 }

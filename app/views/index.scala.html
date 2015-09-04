@@ -2,29 +2,46 @@
 @(json: JsObject, srcAmt: Float, dstAmt: Float, srcCur: String, dstCur: String)
 
 @main("Simple Exchange") {
-    <form action="/" method="get">
-        <input name="srcAmt" type="number" min="0" value="@srcAmt" /> in
-        <select name="srcCur">
-        @for(key <- json.keys.toList.sorted) {
-            <option @if(srcCur.startsWith(key)) {selected="selected"} value="@key">
-            @{val s = key + " - " + json.value.get(key).get.toString().replace("\"", ""); s}
-            </option>
-        }
-        </select> <br/>
-        is
-        <br/>
-        <input name="dstAmt" type="number" min="0" value="@dstAmt" disabled/> in
-        <select name="dstCur">
-        @for(key <- json.keys.toList.sorted) {
-            <option @if(dstCur.startsWith(key)) {selected="selected"} value="@key">
-            @{val s = key + " - " + json.value.get(key).get.toString().replace("\"", ""); s}
-            </option>
-        }
-        </select><br/>
-        <button type="submit">Calculate!</button>
-    </form>
-    <script type="text/javascript">
-      $('select').select2({width: 'resolve'});
-    </script>
+    <form class="form-inline" action='/' method='get'>
+        <div class="input-group">
+            <input name="srcAmt" id="srcAmt" type="number" class="form-control conversion-form" placeholder="Enter an amount..." min="0" value="@srcAmt" />
 
+            <span class="input-group-btn">
+                <select name="srcCur" id="srcCur" class="form-control select select-default conversion" style="visibility: hidden">
+                    @for(key <- json.keys.toList.sorted) {
+                        <option @if(srcCur.startsWith(key)) {selected="selected"} value="@key">
+                        @{val s = key + " - " + json.value.get(key).get.toString().replace("\"", ""); s}
+                        </option>
+                    }
+                </select>
+            </span>
+
+            <span class="input-group-btn">
+                <button type="button" id="swap-button" class="btn btn-default conversion-form"><span class="glyphicon glyphicon-resize-horizontal" aria-hidden="true"></span></button>
+            </span>
+
+            <span class="input-group-btn">
+                <select name="dstCur" id="dstCur" class="form-control select select-default" style="visibility: hidden">
+                    @for(key <- json.keys.toList.sorted) {
+                        <option @if(dstCur.startsWith(key)) {selected="selected"} value="@key">
+                        @{val s = key + " - " + json.value.get(key).get.toString().replace("\"", ""); s}
+                        </option>
+                    }
+                </select>
+            </span>
+
+            <span class="input-group-btn">
+                <button type="submit" class="btn btn-default conversion-form">Convert!</button>
+            </span>
+        </div>
+    </form>
+    @if(srcAmt != 0) {
+        <div id="displayArea">
+            <span class="display-srcAmt">@srcAmt</span>
+            <span class="display-srcCur">@srcCur</span>
+            <span class="display-eq">=</span>
+            <span class="display-dstAmt">@{f"$dstAmt%1.10f"}</span>
+            <span class="display-srcCur">@dstCur</span>
+        </div>
+    }
 }
