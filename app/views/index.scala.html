@@ -36,13 +36,11 @@
             </span>
         </div>
     </form>
-    @if(srcAmt != 0) {
-        <div id="displayArea">
-            <span class="display-srcAmt">@{var fmt = new DecimalFormat("#.##########"); fmt.format(srcAmt.toDouble)}</span>
-            <span class="display-srcCur">@srcCur</span>
-            <span class="display-eq">=</span>
-            <span class="display-dstAmt">@{var fmt = new DecimalFormat("#.##########"); fmt.format(dstAmt.toDouble)}</span>
-            <span class="display-srcCur">@dstCur</span>
-        </div>
-    }
+    <div id="displayArea">
+        <span class="display-srcAmt">@{var fmt = new DecimalFormat("#.##########"); fmt.format(srcAmt.toDouble)}</span>
+        <span class="display-srcCur">@srcCur</span>
+        <span class="display-eq">=</span>
+        <span class="display-dstAmt">@{var fmt = new DecimalFormat("#.##########"); fmt.format(dstAmt.toDouble)}</span>
+        <span class="display-srcCur">@dstCur</span>
+    </div>
 }
