@@ -68,9 +68,10 @@ form {
 }
 
 .conversion-form {
-    border-radius: 0px;
+    border-radius: 0px !important;
     border-width: 1px;
     border-color: #1abc9c !important;
+    border-style: solid;
     background-color: #34495e !important;
     color: #ecf0f1 !important;
     box-shadow: none !important;
@@ -79,7 +80,6 @@ form {
     background-color: #16a085 !important;
 }
 #swap-button {
-    border-radius:0px;
+    border-width: 1px !important;
     margin-left:-1px;
-    margin-right:-1px;
 }

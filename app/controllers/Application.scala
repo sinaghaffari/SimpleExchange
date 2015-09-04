@@ -5,7 +5,7 @@ import play.api.mvc._
 
 object Application extends Controller {
 
-  def index(srcAmt: Float = 0, dstAmt: Float = 0, srcCur: String = "", dstCur: String = "") = Action {
+  def index(srcAmt: Double = 0, dstAmt: Double = 0, srcCur: String = "", dstCur: String = "") = Action {
     import scala.concurrent.Await
     import scala.concurrent.duration.Duration
     import scala.util.Try
@@ -23,8 +23,8 @@ object Application extends Controller {
     val latestResponse = result.get.asInstanceOf[JsObject]
     val latestRates = latestResponse.value.get("rates").get.asInstanceOf[JsObject]
     if (latestRates.keys.contains(srcCur) && latestRates.keys.contains(dstCur)) {
-      val srcCurVal = latestRates.value.get(srcCur).get.toString().toFloat
-      val dstCurVal = latestRates.value.get(dstCur).get.toString().toFloat
+      val srcCurVal = latestRates.value.get(srcCur).get.toString().toDouble
+      val dstCurVal = latestRates.value.get(dstCur).get.toString().toDouble
       val conversionRate = dstCurVal / srcCurVal
       dstAmt_ = srcAmt * conversionRate
     }
