@@ -13,6 +13,12 @@ jQuery.fn.center = function(parent) {
     return this;
 }
 $(document).ready(function() {
+    $('#srcAmt').keypress( function(e) {
+        var chr = String.fromCharCode(e.which);
+        if (("1234567890.".indexOf(chr) < 0 && e.which != 13) || ("." == chr && $("#srcAmt").val().split('.').length > 1)) {
+            return false;
+        }
+    });
     $('select').select2({theme: "bootstrap", width: "resolve"});
     $('.select2-selection')
         .css("border-radius", "0px")

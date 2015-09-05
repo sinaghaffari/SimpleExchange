@@ -63,7 +63,7 @@ form {
 }
 
 .display-srcCur, .display-dstCur {
-    font-weight: lighter;
+    font-weight: bolder;
     color: #2980b9;
 }
 

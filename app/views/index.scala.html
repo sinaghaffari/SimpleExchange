@@ -1,46 +1,70 @@
 @import play.api.libs.json.JsObject
 @import java.text.DecimalFormat
-@(json: JsObject, srcAmt: Double, dstAmt: Double, srcCur: String, dstCur: String)
+@(json: JsObject, srcAmt: String, dstAmt: String, srcCur: String, dstCur: String, error: String)
 
 @main("Simple Exchange") {
-    <form class="form-inline" action='/' method='get'>
-        <div class="input-group">
-            <input name="srcAmt" id="srcAmt" type="number" class="form-control conversion-form" placeholder="Enter an amount..." min="0" step="any" required="required" value="@{var fmt = new DecimalFormat("0.00########"); fmt.format(srcAmt)}" />
+    @if(error.isEmpty) {
+        <form class="form-inline" action='/' method='get'>
+            <div class="input-group">
+                <input name="srcAmt" id="srcAmt" type="text" class="form-control conversion-form" placeholder="Enter an amount..." min="0" step="any" required="required" value="@{
+                    var fmt = new DecimalFormat("0.00########"); fmt.format(srcAmt.toDouble)
+                }" />
 
-            <span class="input-group-btn">
-                <select name="srcCur" id="srcCur" class="form-control select select-default conversion" style="visibility: hidden">
+                <span class="input-group-btn">
+                    <select name="srcCur" id="srcCur" class="form-control select select-default conversion" style="visibility : hidden">
                     @for(key <- json.keys.toList.sorted) {
-                        <option @if(srcCur.startsWith(key)) {selected="selected"} value="@key">
-                        @{val s = key + " - " + json.value.get(key).get.toString().replace("\"", ""); s}
+                        <option @if(srcCur.startsWith(key)) {
+                            selected="selected"
+                        } value="@key">
+                        @{
+                            val s = key + " - " + json.value.get(key).get.toString().replace("\"", ""); s
+                        }
                         </option>
                     }
-                </select>
-            </span>
+                    </select>
+                </span>
 
-            <span class="input-group-btn">
-                <button type="button" id="swap-button" class="btn btn-default conversion-form"><span class="glyphicon glyphicon-resize-horizontal" aria-hidden="true"></span></button>
-            </span>
+                <span class="input-group-btn">
+                    <button type="button" id="swap-button" class="btn btn-default conversion-form"><span class="glyphicon glyphicon-resize-horizontal" aria-hidden="true"></span></button>
+                </span>
 
-            <span class="input-group-btn">
-                <select name="dstCur" id="dstCur" class="form-control select select-default" style="visibility: hidden">
+                <span class="input-group-btn">
+                    <select name="dstCur" id="dstCur" class="form-control select select-default" style="visibility : hidden">
                     @for(key <- json.keys.toList.sorted) {
-                        <option @if(dstCur.startsWith(key)) {selected="selected"} value="@key">
-                        @{val s = key + " - " + json.value.get(key).get.toString().replace("\"", ""); s}
+                        <option @if(dstCur.startsWith(key)) {
+                            selected="selected"
+                        } value="@key">
+                        @{
+                            val s = key + " - " + json.value.get(key).get.toString().replace("\"", ""); s
+                        }
                         </option>
                     }
-                </select>
-            </span>
+                    </select>
+                </span>
 
-            <span class="input-group-btn">
-                <button type="submit" class="btn btn-default conversion-form">Convert!</button>
-            </span>
+                <span class="input-group-btn">
+                    <button type="submit" class="btn btn-default conversion-form">Convert!</button>
+                </span>
+            </div>
+        </form>
+        <div id="displayArea">
+            <span class="display-srcAmt">@{
+                var fmt = new DecimalFormat("0.00########"); fmt.format(srcAmt.toDouble)
+            }</span>
+            <span class="display-srcCur">@srcCur</span>
+            <span class="display-eq">=</span>
+            <span class="display-dstAmt">@{
+                var fmt = new DecimalFormat("0.00########"); fmt.format(dstAmt.toDouble)
+            }</span>
+            <span class="display-srcCur">@dstCur</span>
         </div>
-    </form>
-    <div id="displayArea">
-        <span class="display-srcAmt">@{var fmt = new DecimalFormat("0.00########"); fmt.format(srcAmt)}</span>
-        <span class="display-srcCur">@srcCur</span>
-        <span class="display-eq">=</span>
-        <span class="display-dstAmt">@{var fmt = new DecimalFormat("0.00########"); fmt.format(dstAmt)}</span>
-        <span class="display-srcCur">@dstCur</span>
-    </div>
+    } else {
+        <div id="displayArea">
+            <div style="color: #e74c3c;font-weight: bolder;">Oops, there was a problem!</div>
+            <div style="color: #1abc9c;margin-top: 20px">@error</div>
+            <div style="margin-top: 20px">
+                <a href="/" type="button" class="btn btn-default conversion-form">Try Again</a>
+            </div>
+        </div>
+    }
 }
