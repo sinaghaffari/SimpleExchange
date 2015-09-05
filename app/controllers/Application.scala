@@ -1,10 +1,13 @@
 package controllers
 
+import java.text.SimpleDateFormat
+import java.util.Calendar
+
 import play.api._
 import play.api.mvc._
 
 object Application extends Controller {
-  def index(srcAmtS: String = "", srcCur: String = "", dstCur: String = "") = Action {
+  def index(srcAmtS: String = "", srcCur: String = "", dstCur: String = "") = Action { request =>
     import scala.concurrent.Await
     import scala.concurrent.duration.Duration
     import play.api.libs.json.JsObject
@@ -12,6 +15,9 @@ object Application extends Controller {
     import play.api.Play.current
     implicit val context = play.api.libs.concurrent.Execution.Implicits.defaultContext
 
+    val timeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    val remoteIP = request.remoteAddress
+    println("[" + timeFormatter.format(Calendar.getInstance().getTime) + "] Request from " + remoteIP + " with parameters " + "(srcAmtS = " + srcAmtS + ", srcCur = " + srcCur + ", dstCur = " + dstCur + ")")
     // Get list of supported currencies.
     val currenciesResponse = Await.ready(
       WS.url("http://openexchangerates.org/currencies.json")
@@ -21,6 +27,7 @@ object Application extends Controller {
     ).value
 
     if (currenciesResponse.isEmpty) { // Check to see if a response was received.
+      println("[" + timeFormatter.format(Calendar.getInstance().getTime) + "]    -> Currency list was not retrieved")
       NotFound(views.html.index(null, "", "", "", "", "Failed to retrieve currency list."))
     } else { // If a response was given, proceed.
       val resultCurrenciesResponse = currenciesResponse.get
@@ -45,6 +52,7 @@ object Application extends Controller {
             ).value
 
             if (ratesResponse.isEmpty) { // Check to see if a result was received.
+              println("[" + timeFormatter.format(Calendar.getInstance().getTime) + "]    -> Latest exchange rates were not retrieved")
               NotFound(views.html.index(currencies, srcAmtS, "", "", "", "Failed to retrieve latest exchange rates."))
             } else {
               val result = ratesResponse.get.get
@@ -54,24 +62,28 @@ object Application extends Controller {
                 case _ => null
               }
               if (latestRates == null) {
+                println("[" + timeFormatter.format(Calendar.getInstance().getTime) + "]    -> Latest exchange rates were not retrieved")
                 NotFound(views.html.index(currencies, srcAmtS, "", "", "", "Failed to retrieve latest exchange rates."))
               } else {
                 val srcCurVal = BigDecimal(latestRates.value.get(srcCur).get.toString())
                 val dstCurVal = BigDecimal(latestRates.value.get(dstCur).get.toString())
                 val conversionRate = dstCurVal / srcCurVal
-                println("ConversionRate = " + conversionRate + " is a BigDecimal:" + conversionRate.isInstanceOf[BigDecimal])
                 Ok(views.html.index(currencies, "" + srcAmt, "" + (srcAmt * conversionRate), srcCur, dstCur, ""))
               }
             }
           } else { // Improper srcCur or dstCur
-            BadRequest(views.html.index(currencies, "", "", "", "", "srcCur or dstCur not a supported currency code."))
+            println("[" + timeFormatter.format(Calendar.getInstance().getTime) + "]    -> srcCur = " + srcCur + " or dstCur = " + dstCur + " are not supported currency codes")
+            BadRequest(views.html.index(currencies, "", "", "", "", "srcCur or dstCur are not supported currency codes"))
           }
         } else { // Improper srcAmt.
+          println("[" + timeFormatter.format(Calendar.getInstance().getTime) + "]    -> Invalid srcAmt input " + srcAmtS)
           BadRequest(views.html.index(currencies, "", "", "", "", "The amount you entered is not a valid decimal value. Try again."))
         }
       } else { // Supported Currencies were not received.
+        println("[" + timeFormatter.format(Calendar.getInstance().getTime) + "]    -> Currency list was not retrieved")
         NotFound(views.html.index(null, "", "", "", "", "Failed to retrieve currency list."))
       }
     }
   }
+
 }
