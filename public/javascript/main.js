@@ -15,7 +15,7 @@ jQuery.fn.center = function(parent) {
 $(document).ready(function() {
     $('#srcAmt').keypress( function(e) {
         var chr = String.fromCharCode(e.which);
-        if (("1234567890.".indexOf(chr) < 0 && e.which != 13) || ("." == chr && $("#srcAmt").val().split('.').length > 1)) {
+        if (("1234567890.".indexOf(chr) < 0 && e.which < 8 && e.which > 46) || ("." == chr && $("#srcAmt").val().split('.').length > 1)) {
             return false;
         }
     });
