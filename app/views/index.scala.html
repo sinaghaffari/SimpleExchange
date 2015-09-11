@@ -1,6 +1,7 @@
 @import play.api.libs.json.JsObject
+@import play.api.libs.json.JsValue
 @import java.text.DecimalFormat
-@(json: JsObject, srcAmt: String, dstAmt: String, srcCur: String, dstCur: String, error: String)
+@(currencies: JsObject, srcAmt: String, rates: JsObject, srcCur: String, dstCur: String, error: String)
 
 @main("Simple Exchange") {
     @if(error.isEmpty) {
@@ -12,12 +13,12 @@
 
                 <span class="input-group-btn">
                     <select name="srcCur" id="srcCur" class="form-control select select-default conversion" style="visibility : hidden">
-                    @for(key <- json.keys.toList.sorted) {
+                    @for(key <- currencies.keys.toList.sorted) {
                         <option @if(srcCur.startsWith(key)) {
                             selected="selected"
                         } value="@key">
                         @{
-                            val s = key + " - " + json.value.get(key).get.toString().replace("\"", ""); s
+                            val s = key + " - " + currencies.value.get(key).get.toString().replace("\"", ""); s
                         }
                         </option>
                     }
@@ -30,12 +31,12 @@
 
                 <span class="input-group-btn">
                     <select name="dstCur" id="dstCur" class="form-control select select-default" style="visibility : hidden">
-                    @for(key <- json.keys.toList.sorted) {
+                    @for(key <- currencies.keys.toList.sorted) {
                         <option @if(dstCur.startsWith(key)) {
                             selected="selected"
                         } value="@key">
                         @{
-                            val s = key + " - " + json.value.get(key).get.toString().replace("\"", ""); s
+                            val s = key + " - " + currencies.value.get(key).get.toString().replace("\"", ""); s
                         }
                         </option>
                     }
@@ -49,12 +50,28 @@
         </form>
         <div id="displayArea">
             <span class="display-srcAmt">@{
-                var fmt = new DecimalFormat("0.00########"); fmt.format(BigDecimal(srcAmt))
+                val fmt = new DecimalFormat("0.00########"); fmt.format(BigDecimal(srcAmt))
             }</span>
             <span class="display-srcCur">@srcCur</span>
             <span class="display-eq">=</span>
             <span class="display-dstAmt">@{
-                var fmt = new DecimalFormat("0.00########"); fmt.format(BigDecimal(dstAmt))
+                if (rates == null) {
+                    "ERR"
+                } else {
+                    import play.api.Play.current
+                    implicit val context = play.api.libs.concurrent.Execution.Implicits.defaultContext
+                    import play.api.cache.Cache
+
+                    Cache.set("rates", rates)
+                    val srcCurVal: BigDecimal = rates.value.get(srcCur).map(t => BigDecimal(t.toString)).orNull
+                    val dstCurVal: BigDecimal = rates.value.get(dstCur).map(t => BigDecimal(t.toString)).orNull
+                    if(srcCurVal != null && dstCurVal != null) {
+                        val fmt = new DecimalFormat("0.00########")
+                        fmt.format(BigDecimal(srcAmt) * dstCurVal / srcCurVal)
+                    } else {
+                        "ERR"
+                    }
+                }
             }</span>
             <span class="display-srcCur">@dstCur</span>
         </div>
