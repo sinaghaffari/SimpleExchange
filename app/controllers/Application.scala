@@ -31,7 +31,8 @@ object Application extends Controller {
         Ok(views.html.index(tools.Util.getSupportedCurrencies,
           srcAmt,
           srcCur,
-          dstCur, dstAmt, ""))
+          dstAmt,
+          dstCur, ""))
       } else {
         val error = (response.json \ "error").validate[String].getOrElse(null)
         Ok(views.html.index(null, "", "", "", "", error))
