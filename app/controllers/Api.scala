@@ -12,23 +12,19 @@ import play.api.cache.Cache
 import play.api.libs.json.{Json, JsObject}
 import play.api.libs.ws.WS
 import play.api.mvc._
+import tools.Util.isValidAmount
 
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 object Api extends Controller {
-  def index() = Action.async { request =>
+  def rates() = Action.async { request =>
     import play.api.Play.current
     implicit val context = play.api.libs.concurrent.Execution.Implicits.defaultContext
     val timeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     val remoteIP = request.remoteAddress
-
-    val body: JsObject = request.body.asJson.orNull match {
-      case t: JsObject => t
-      case _ => null
-    }
-
-    val currencies = tools.Util.getSupportedCurrencies
-
+    val body = request.body.asJson.map(_.as[JsObject]).orNull
+    val currencies = Await.result(tools.Util.getSupportedCurrencies, Duration.Inf).orNull
     if (currencies == null) {
       Future {
         NotFound(Json.obj("error" -> "List of supported currencies could not be retrieved."))
@@ -55,16 +51,10 @@ object Api extends Controller {
         BadRequest(Json.obj("error" -> "The requested destination currency is not supported. Please try again."))
       }
     } else {
-      val temp1 = Cache.get("ratesTime").getOrElse("-1")
-      val lastCall: Long = temp1 match {
-        case t: Long => t
-        case _ => (-1).toLong
-      }
+      val lastCall = Cache.getAs[Long]("ratesTime").getOrElse(-1L)
+
       {
-        val currentCache: JsObject = Cache.get("rates").orNull match {
-          case t: JsObject => t
-          case _ => null
-        }
+        val currentCache: JsObject = Cache.getAs[JsObject]("rates").orNull
         if (currentCache == null || lastCall == -1 || (System.currentTimeMillis() - lastCall) > 3600000) {
           // Rates have expired.
           if (lastCall != -1) println("    Rates expired " + (System.currentTimeMillis() - lastCall - 3600000) + " ms ago.")
@@ -104,5 +94,31 @@ object Api extends Controller {
         ))
       }
     }
+  }
+
+  def list() = Action.async {request =>
+    import play.api.Play.current
+    implicit val context = play.api.libs.concurrent.Execution.Implicits.defaultContext
+    WS.url("http://openexchangerates.org/currencies.json").get()
+      .map {response => Ok(response.json)}
+  }
+
+  def convert() = Action.async {request =>
+    import scala.util.Random
+    implicit val context = play.api.libs.concurrent.Execution.Implicits.defaultContext
+    Future(Ok(
+    request.body.asJson
+      .map { body =>
+        val srcAmt = (body \ "srcAmt").validate[String].getOrElse(null)
+        val srcCur = (body \ "srcCur").validate[String].getOrElse(null)
+        val dstAmt = (body \ "dstAmt").validate[String].getOrElse(null)
+        val dstCur = (body \ "dstCur").validate[String].getOrElse(null)
+        if (srcAmt == null || srcCur == null || dstAmt == null || dstCur == null)
+          Json.obj("error" -> "Invalid inputs.")
+
+        val rand = new Random().nextDouble()
+        val result = rand < 0.8
+        Json.obj("result" -> (if(result)  "success" else "failure"))
+      }.orNull))
   }
 }
