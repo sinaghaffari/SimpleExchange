@@ -118,7 +118,7 @@ object Api extends Controller {
 
         val rand = new Random().nextDouble()
         val result = rand < 0.8
-        Json.obj("result" -> (if(result)  "success" else "failure"))
+        Json.obj("success" -> result)
       }.orNull))
   }
 }
