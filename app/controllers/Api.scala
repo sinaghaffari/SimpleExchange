@@ -107,7 +107,7 @@ object Api extends Controller {
     import scala.util.Random
     implicit val context = play.api.libs.concurrent.Execution.Implicits.defaultContext
     Future(Ok(
-    request.body.asJson
+    Json.parse(request.body.asText.get).asOpt[JsObject]
       .map { body =>
         val srcAmt = (body \ "srcAmt").validate[String].getOrElse(null)
         val srcCur = (body \ "srcCur").validate[String].getOrElse(null)
