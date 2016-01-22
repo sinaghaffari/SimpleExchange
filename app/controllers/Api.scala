@@ -23,7 +23,7 @@ object Api extends Controller {
     implicit val context = play.api.libs.concurrent.Execution.Implicits.defaultContext
     val timeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     val remoteIP = request.remoteAddress
-    val body = Json.parse(request.body.asText.get).as[JsObject]
+    val body = request.body.asJson.get.as[JsObject]
     val currencies = Await.result(tools.Util.getSupportedCurrencies, Duration.Inf).orNull
     if (currencies == null) {
       Future {
